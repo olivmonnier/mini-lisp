@@ -1,44 +1,43 @@
 var constants = require('./constants');
 var _ = require('lodash');
 
-module.exports = function Tokenizer(text) {
+module.exports = function tokenizer(text) {
   var result = [];
   var tokenStream = new TokenStream(text);
 
-  while(!token.isDone()) {
+  while(!tokenStream.isDone()) {
     var token = tokenStream.currentToken();
 
-    switch(token) {
-      case constants.isAToken(token):
-        result.push({ type: 'operator', value: token });
-        break;
-
-      case constants.isALetter(token):
-        while (constants.isALetter(tokenStream.nextToken())) {
-          tokenStream.advance();
-          token += tokenStream.currentToken();
-        }
-        result.push({ type: 'keyword', value: token });
-        break;
-
-      case constants.isANumber(token):
-        while (constants.isANumber(tokenStream.nextToken())) {
-          tokenStream.advance();
-          token += tokenStream.currentToken();
-        }
-        result.push({ type: '', value: token });
-        break;
-
-      case token === constants.quote:
-        while (constants.isALetter(tokenStream.nextToken())) {
-          tokenStream.advance();
-				  token += tokenStream.currentToken();
-        }
-        tokenStream.advance();
-			  token += tokenStream.currentToken();
-			  result.push({ type: 'string', value: token });
-        break;
+    if (constants.isAToken(token)) {
+      result.push({ type: 'operator', value: token });
     }
+
+    else if (constants.isALetter(token)) {
+      while (constants.isALetter(tokenStream.nextToken())) {
+        tokenStream.advance();
+        token += tokenStream.currentToken();
+      }
+      result.push({ type: 'keyword', value: token });
+    }
+
+    else if (constants.isANumber(token)) {
+      while (constants.isANumber(tokenStream.nextToken())) {
+        tokenStream.advance();
+        token += tokenStream.currentToken();
+      }
+      result.push({ type: 'number', value: token });
+    }
+    
+    else if (token === constants.quote) {
+      while (constants.isALetter(tokenStream.nextToken())) {
+        tokenStream.advance();
+        token += tokenStream.currentToken();
+      }
+      tokenStream.advance();
+      token += tokenStream.currentToken();
+      result.push({ type: 'string', value: token });
+    }
+
     tokenStream.advance();
   }
   return result;
@@ -67,5 +66,5 @@ TokenStream.prototype.isDone = function() {
 }
 
 TokenStream.prototype.nextToken = function() {
-  return this.text[this.index++];
+  return this.text[this.index + 1];
 }
