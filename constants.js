@@ -18,5 +18,6 @@ module.exports = {
 		'/': 'core.math.divide',
 		'print': 'core.debug.print'
 	},
-	coreFunctions: ['print', 'def']
+	coreFunctions: ['print', 'def'],
+  conditions: ['if', 'do', 'else']
 }
