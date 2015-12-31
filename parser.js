@@ -37,6 +37,17 @@ function processOperators(token, ast) {
     case constants.closeParens:
       ast.back();
       break;
+    default:
+      if (_.contains(constants.assignments, token.value)) {
+        ast.pointer.setType('assignment');
+        ast.pointer.setValue(token.value);
+
+      } else if (_.contains(constants.comparison, token.value)) {
+        var tree  = new Tree();
+        tree.setType('comparison');
+        tree.setValue(token.value);
+        ast.pointer.insert(tree);
+      }
   }
 }
 
