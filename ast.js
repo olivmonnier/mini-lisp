@@ -1,10 +1,10 @@
-module.exports = AstResults = function() {
+module.exports = AstResults = function(){
 	this.roots = [];
     this.history = [];
     this.pointer = null;
 }
 
-AstResults.prototype.newTree = function(tree) {
+AstResults.prototype.newTree = function(tree){
 	if(this.pointer === null){
 		this.roots.push(tree);
 		this.history.push(tree);
@@ -17,7 +17,7 @@ AstResults.prototype.newTree = function(tree) {
 
 }
 
-AstResults.prototype.previous = function() {
+AstResults.prototype.previous = function(){
 	if(!this.history.length){
 		return null;
 	} else {
@@ -25,12 +25,12 @@ AstResults.prototype.previous = function() {
 	}
 }
 
-AstResults.prototype.addChild = function(child) {
+AstResults.prototype.addChild = function(child){
 	this.pointer.insert(child);
 	this.pointer = child;
 }
 
-AstResults.prototype.back = function() {
+AstResults.prototype.back = function(){
 	this.history.pop();
 	if(!this.history.length){
 		this.pointer = null;
