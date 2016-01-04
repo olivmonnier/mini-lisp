@@ -25,6 +25,8 @@ function interpretNode(node, controller) {
     }
   } else if (type === 'assignment') {
     writeAssignment(node, controller);
+  } else if (type === 'condition') {
+    writeCondition(node, controller);
   } else {
     controller.result += node.get('value');
   }
@@ -36,6 +38,13 @@ function writeAssignment(node, controller) {
   variable += node.children[0].data.value;
   controller.result += variable + value;
   interpretNode(node.children[1], controller);
+}
+
+function writeCondition(node, controller) {
+  var value = node.get('value');
+  if (value === 'if' || value === 'elseif') {
+
+  }
 }
 
 function writeFunction(ast, controller) {
