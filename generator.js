@@ -23,9 +23,19 @@ function interpretNode(node, controller) {
     } else {
       writeFunction(node, controller);
     }
+  } else if (type === 'assignment') {
+    writeAssignment(node, controller);
   } else {
     controller.result += node.get('value');
   }
+}
+
+function writeAssignment(node, controller) {
+  var value = node.get('value');
+  var variable = (node.children[0].data.type === 'variable') ? 'var ' : '';
+  variable += node.children[0].data.value;
+  controller.result += variable + value;
+  interpretNode(node.children[1], controller);
 }
 
 function writeFunction(ast, controller) {
@@ -49,7 +59,7 @@ function writeCustomFunction(node, controller) {
 	var arguments = node.children[1];
 	var functionBody = node.children[2];
 
-	controller.result += 'var '+functionName.get('value')+' = function(';
+	controller.result += 'function ' + functionName.get('value') + '(';
 
 	var numArgs = arguments.children.length;
 
@@ -60,7 +70,7 @@ function writeCustomFunction(node, controller) {
 		}
 	});
 
-	controller.result += '){\n';
+	controller.result += ') {\n';
 
 	var customController = new Controller();
 	interpretNode(functionBody, customController);
