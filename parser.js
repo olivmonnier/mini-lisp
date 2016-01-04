@@ -4,6 +4,7 @@ var Tree = require('./tree.js');
 var AstResult = require('./ast.js');
 
 var FUNC_NAMES = constants.coreFunctions.slice();
+var COND_NAMES = constants.conditions.slice();
 
 module.exports = function Parser(tokens) {
   var ast = new AstResult();
@@ -36,6 +37,17 @@ function processOperators(token, ast) {
     case constants.closeParens:
       ast.back();
       break;
+    default:
+      if (_.contains(constants.assignments, token.value)) {
+        ast.pointer.setType('assignment');
+        ast.pointer.setValue(token.value);
+
+      } else if (_.contains(constants.comparison, token.value)) {
+        var tree  = new Tree();
+        tree.setType('comparison');
+        tree.setValue(token.value);
+        ast.pointer.insert(tree);
+      }
   }
 }
 
@@ -56,7 +68,7 @@ function processKeywords(token, ast) {
     FUNC_NAMES.push(token.value)
     ast.pointer.insert(tree);
 
-  } else if (ast.pointer.get('value') === null && !_.contains(FUNC_NAMES, token.value)) {
+  } else if (ast.pointer.get('value') === null && !_.contains(FUNC_NAMES, token.value) && !_.contains(COND_NAMES, token.value)) {
     ast.pointer.setType('arguments');
     var tree = new Tree();
     tree.setType('variable');
@@ -67,6 +79,9 @@ function processKeywords(token, ast) {
     ast.pointer.setType('function');
     ast.pointer.setValue(token.value);
 
+  } else if (_.contains(COND_NAMES, token.value)) {
+    ast.pointer.setType('condition');
+    ast.pointer.setValue(token.value);
   } else {
     processValue(token, ast);
   }

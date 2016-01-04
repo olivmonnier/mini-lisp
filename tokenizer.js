@@ -6,8 +6,13 @@ module.exports = function tokenizer(text) {
 	var tokenStream = new TokenStream(text);
 	while (!tokenStream.isDone()) {
 		var token = tokenStream.currentToken();
+    var nextToken = tokenStream.nextToken();
 
 		if (constants.isAToken(token)) {
+      while (tokenStream.nextToken() === '=') {
+        tokenStream.advance();
+				token += tokenStream.currentToken();
+      }
 			result.push({ type: 'operator', value: token });
 		}
 
