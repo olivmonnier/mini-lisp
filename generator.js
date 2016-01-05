@@ -42,7 +42,7 @@ function writeAssignment(node, controller) {
 
 function writeCondition(node, controller) {
   var value = node.get('value');
-  if (value === 'if' || value === 'elseif') {
+  if ((value === 'if') || (value === 'elseif')) {
     var condition = _.result(_.find(node.children, function(child) {
       return child.data.type === 'arguments';
     }), 'children');
@@ -53,6 +53,17 @@ function writeCondition(node, controller) {
       return arg.data.type !== 'comparison';
     });
     controller.result += value + '(' + values[0].data.value + operator + values[0].data.value + ') {\n';
+    var conditions = node.children.filter(function(arg) {
+      return arg.data.type === 'condition';
+    });
+    _.each(conditions, function(condition) {
+      interpretNode(condition, controller);
+    });
+    controller.result += '\n}\n';
+  } else if ((value === 'do') || (value === 'else')) {
+    controller.result += value + '{\n';
+    interpretNode(node.children, controller);
+    controller.result += '\n}\n';
   }
 }
 
