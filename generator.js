@@ -43,7 +43,16 @@ function writeAssignment(node, controller) {
 function writeCondition(node, controller) {
   var value = node.get('value');
   if (value === 'if' || value === 'elseif') {
-
+    var condition = _.result(_.find(node.children, function(child) {
+      return child.data.type === 'arguments';
+    }), 'children');
+    var operator = _.result(_.find(condition, function(arg) {
+      return arg.data.type === 'comparison';
+    }), 'data.value');
+    var values = condition.filter(function(arg) {
+      return arg.data.type !== 'comparison';
+    });
+    controller.result += value + '(' + values[0].data.value + operator + values[0].data.value + ') {\n';
   }
 }
 

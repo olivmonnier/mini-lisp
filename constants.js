@@ -22,5 +22,5 @@ module.exports = {
   assignments: ['=', '+=', '-=', '*=', '/=', '%='],
   comparison: ['==', '===', '!=', '!==', '>', '<', '>=', '<='],
 	coreFunctions: ['print', 'def'],
-  conditions: ['if', 'do', 'else']
+  conditions: ['if', 'do', 'else', 'elseif']
 }
