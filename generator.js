@@ -47,7 +47,9 @@ function writeAssignment(node, controller) {
 
 function writeCondition(node, controller) {
   var value = node.get('value');
-  if ((value === 'if') || (value === 'elseif')) {
+  if (value === 'elseif') value = 'else if';
+
+  if ((value === 'if') || (value === 'else if')) {
     var comparison = _.result(_.find(node.children, function(child) {
       return child.data.type === 'arguments';
     }), 'children');
@@ -72,11 +74,15 @@ function writeCondition(node, controller) {
     });
 
   } else if (value === 'do') {
-    interpretNode(node.children[0], controller);
+    _.each(node.children, function(arg) {
+      interpretNode(arg, controller);
+    });
 
   } else if (value === 'else') {
     controller.result += value + '{\n';
-    interpretNode(node.children[0], controller);
+    _.each(node.children, function(arg) {
+      interpretNode(arg, controller);
+    });
     controller.result += '\n}\n';
   }
 }
@@ -94,7 +100,7 @@ function writeFunction(ast, controller) {
 			controller.result += ', ';
 		}
 	});
-	controller.result += ')';
+	controller.result += ');';
 }
 
 function writeCustomFunction(node, controller) {
@@ -118,6 +124,6 @@ function writeCustomFunction(node, controller) {
 	var customController = new Controller();
 	interpretNode(functionBody, customController);
 
-	controller.result += 'return '+customController.result+ ';';
+	controller.result += 'return '+customController.result;
 	controller.result += '\n}\n';
 }
