@@ -1,3 +1,8 @@
+// var util = require('util');
+// function print(test) {
+//   console.log(util.inspect(test, false, null));
+// }
+
 var _ = require('lodash');
 var constants = require('./constants');
 
@@ -43,26 +48,35 @@ function writeAssignment(node, controller) {
 function writeCondition(node, controller) {
   var value = node.get('value');
   if ((value === 'if') || (value === 'elseif')) {
-    var condition = _.result(_.find(node.children, function(child) {
+    var comparison = _.result(_.find(node.children, function(child) {
       return child.data.type === 'arguments';
     }), 'children');
-    var operator = _.result(_.find(condition, function(arg) {
+    var operator = _.result(_.find(comparison, function(arg) {
       return arg.data.type === 'comparison';
     }), 'data.value');
-    var values = condition.filter(function(arg) {
+    var values = comparison.filter(function(arg) {
       return arg.data.type !== 'comparison';
     });
-    controller.result += value + '(' + values[0].data.value + operator + values[0].data.value + ') {\n';
-    var conditions = node.children.filter(function(arg) {
-      return arg.data.type === 'condition';
+    var conditionApply = _.find(node.children, function(arg) {
+      return (arg.data.type === 'condition') && ((arg.data.value === 'do') || (arg.data.value === 'if'));
     });
+    var conditions = node.children.filter(function(arg) {
+      return (arg.data.type === 'condition') && (arg.data.value !== 'do') && (arg.data.value !== 'if');
+    });
+
+    controller.result += value + '(' + values[0].data.value + operator + values[0].data.value + ') {\n';
+    interpretNode(conditionApply, controller);
+    controller.result += '\n}\n';
     _.each(conditions, function(condition) {
       interpretNode(condition, controller);
     });
-    controller.result += '\n}\n';
-  } else if ((value === 'do') || (value === 'else')) {
+
+  } else if (value === 'do') {
+    interpretNode(node.children[0], controller);
+
+  } else if (value === 'else') {
     controller.result += value + '{\n';
-    interpretNode(node.children, controller);
+    interpretNode(node.children[0], controller);
     controller.result += '\n}\n';
   }
 }

@@ -82,6 +82,7 @@ function processKeywords(token, ast) {
   } else if (_.contains(COND_NAMES, token.value)) {
     ast.pointer.setType('condition');
     ast.pointer.setValue(token.value);
+
   } else {
     processValue(token, ast);
   }
